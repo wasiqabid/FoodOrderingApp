@@ -10,13 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import kotlinx.coroutines.launch
 
 class SignupActivity : AppCompatActivity() {
 
@@ -65,38 +59,6 @@ class SignupActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
-        }
-
-        findViewById<Button>(R.id.googleSignupButton).setOnClickListener {
-            signUpWithGoogle()
-        }
-    }
-
-    private fun signUpWithGoogle() {
-        val credentialManager = CredentialManager.create(this)
-        
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("779306655315-0gftnj84qeqbg03ljcf97fde6pkb9vbv.apps.googleusercontent.com")
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        lifecycleScope.launch {
-            try {
-                val result = credentialManager.getCredential(this@SignupActivity, request)
-                val credential = result.credential
-                
-                if (credential is GoogleIdTokenCredential) {
-                    Toast.makeText(this@SignupActivity, "Verifying with Google...", Toast.LENGTH_SHORT).show()
-                    viewModel.onGoogleSignup(credential.idToken)
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("GoogleAuth", "Error: ${e.message}")
-                Toast.makeText(this@SignupActivity, "Google Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-            }
         }
     }
 }

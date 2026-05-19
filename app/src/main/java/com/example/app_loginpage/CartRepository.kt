@@ -1,11 +1,37 @@
 package com.example.app_loginpage
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 object CartRepository {
     private val _cartItems = MutableLiveData<MutableList<CartItem>>(mutableListOf())
     val cartItems: LiveData<MutableList<CartItem>> = _cartItems
+    
+    private var prefs: SharedPreferences? = null
+    private val gson = Gson()
+
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences("feasto_cart_prefs", Context.MODE_PRIVATE)
+        loadCart()
+    }
+
+    private fun saveCart() {
+        val json = gson.toJson(_cartItems.value)
+        prefs?.edit()?.putString("cart_json", json)?.apply()
+    }
+
+    private fun loadCart() {
+        val json = prefs?.getString("cart_json", null)
+        if (json != null) {
+            val type = object : TypeToken<MutableList<CartItem>>() {}.type
+            val items: MutableList<CartItem> = gson.fromJson(json, type)
+            _cartItems.postValue(items)
+        }
+    }
 
     fun addItem(item: CartItem) {
         val currentList = _cartItems.value?.toMutableList() ?: mutableListOf()
@@ -17,7 +43,8 @@ object CartRepository {
         } else {
             currentList.add(item.copy(quantity = 1))
         }
-        _cartItems.postValue(currentList)
+        _cartItems.value = currentList
+        saveCart()
     }
 
     fun removeItem(itemId: String) {
@@ -32,7 +59,8 @@ object CartRepository {
                 currentList.removeAt(index)
             }
         }
-        _cartItems.postValue(currentList)
+        _cartItems.value = currentList
+        saveCart()
     }
 
     fun getQuantity(itemId: String): Int {
@@ -40,6 +68,7 @@ object CartRepository {
     }
 
     fun clearCart() {
-        _cartItems.postValue(mutableListOf())
+        _cartItems.value = mutableListOf()
+        saveCart()
     }
 }

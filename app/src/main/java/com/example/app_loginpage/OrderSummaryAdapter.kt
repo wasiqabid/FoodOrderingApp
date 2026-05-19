@@ -26,7 +26,7 @@ class OrderSummaryAdapter : ListAdapter<CartItem, OrderSummaryAdapter.SummaryVie
         fun bind(item: CartItem) {
             qtyName.text = "${item.quantity} x ${item.name}"
             val totalPrice = item.quantity * item.price
-            price.text = String.format(Locale.US, "%.2f", totalPrice)
+            price.text = String.format(Locale.US, "Rs. %.2f", totalPrice)
         }
     }
 }

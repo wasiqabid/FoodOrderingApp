@@ -10,13 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
@@ -65,38 +59,6 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, SignupActivity::class.java)
             startActivity(intent)
             finish()
-        }
-
-        findViewById<Button>(R.id.googleLoginButton).setOnClickListener {
-            signInWithGoogle()
-        }
-    }
-
-    private fun signInWithGoogle() {
-        val credentialManager = CredentialManager.create(this)
-        
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("779306655315-0gftnj84qeqbg03ljcf97fde6pkb9vbv.apps.googleusercontent.com")
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        lifecycleScope.launch {
-            try {
-                val result = credentialManager.getCredential(this@LoginActivity, request)
-                val credential = result.credential
-                
-                if (credential is GoogleIdTokenCredential) {
-                    Toast.makeText(this@LoginActivity, "Verifying with Google...", Toast.LENGTH_SHORT).show()
-                    viewModel.onGoogleLogin(credential.idToken)
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("GoogleAuth", "Error: ${e.message}")
-                Toast.makeText(this@LoginActivity, "Google Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
-            }
         }
     }
 }

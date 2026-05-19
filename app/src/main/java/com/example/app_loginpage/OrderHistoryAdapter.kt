@@ -29,7 +29,7 @@ class OrderHistoryAdapter : ListAdapter<Order, OrderHistoryAdapter.OrderViewHold
         fun bind(order: Order) {
             val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
             dateText.text = order.timestamp?.toDate()?.let { sdf.format(it) } ?: "N/A"
-            totalText.text = String.format(Locale.US, "%.2f", order.totalAmount)
+            totalText.text = String.format(Locale.US, "Rs. %.2f", order.totalAmount)
             
             val itemsString = order.items.joinToString("\n") { "${it.quantity} x ${it.name}" }
             itemsText.text = itemsString

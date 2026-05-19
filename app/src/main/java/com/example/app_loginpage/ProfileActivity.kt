@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ProfileViewModel
+    private var isEditing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +33,42 @@ class ProfileActivity : AppCompatActivity() {
             insets
         }
 
+        val nameInput = findViewById<EditText>(R.id.userNameDisplay)
+        val editBtn = findViewById<ImageView>(R.id.editNameBtn)
+
+        // Load and observe user data
+        viewModel.userName.observe(this) { name ->
+            nameInput.setText(name)
+        }
+        viewModel.loadUserData()
+
+        // Toggle Edit/Save
+        editBtn.setOnClickListener {
+            if (!isEditing) {
+                // Start Editing
+                isEditing = true
+                nameInput.isEnabled = true
+                nameInput.requestFocus()
+                editBtn.setImageResource(android.R.drawable.ic_menu_save)
+                Toast.makeText(this, "You can now edit your name", Toast.LENGTH_SHORT).show()
+            } else {
+                // Save Changes
+                val newName = nameInput.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    viewModel.saveUserName(newName)
+                    isEditing = false
+                    nameInput.isEnabled = false
+                    editBtn.setImageResource(R.drawable.ic_edit)
+                    Toast.makeText(this, "Name saved successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         // Logout Logic
         findViewById<Button>(R.id.logoutBtn).setOnClickListener {
-            com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+            FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, AuthActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

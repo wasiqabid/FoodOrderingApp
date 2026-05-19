@@ -41,7 +41,7 @@ class OrderPlacementActivity : AppCompatActivity() {
         CartRepository.cartItems.observe(this) { items ->
             adapter.submitList(items.toMutableList())
             val total = items.sumOf { it.price * it.quantity }
-            totalText.text = String.format(Locale.US, "%.2f", total)
+            totalText.text = String.format(Locale.US, "Rs. %.2f", total)
         }
 
         findViewById<MaterialButton>(R.id.confirmOrderButton).setOnClickListener {

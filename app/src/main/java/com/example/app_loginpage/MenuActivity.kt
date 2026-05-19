@@ -22,6 +22,10 @@ class MenuActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Ensure Cart Persistence is initialized
+        CartRepository.init(this)
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_menu)
 
@@ -34,13 +38,18 @@ class MenuActivity : AppCompatActivity() {
         }
 
         // Popular Section Dynamic Setup
+        val popularLayout = findViewById<View>(R.id.popularItemsLayout)
         viewModel.popularItems.observe(this) { items ->
             val beefBurger = items.find { it.name.lowercase().contains("beef burger") }
             val pepperoniPizza = items.find { it.name.lowercase().contains("pepperoni passion") }
 
+            if (beefBurger != null || pepperoniPizza != null) {
+                popularLayout.visibility = View.VISIBLE
+            }
+
             beefBurger?.let { item ->
                 findViewById<TextView>(R.id.popularBurgerName).text = item.name
-                findViewById<TextView>(R.id.popularBurgerPrice).text = String.format(Locale.US, "%.0f", item.price)
+                findViewById<TextView>(R.id.popularBurgerPrice).text = String.format(Locale.US, "Rs. %.0f", item.price)
                 Glide.with(this).load(item.imageUrl).into(findViewById(R.id.popularBurgerImage))
                 findViewById<ImageView>(R.id.addBurger).setOnClickListener {
                     CartRepository.addItem(CartItem(item.id, item.name, item.description, item.price, 1, 0, item.imageUrl))
@@ -50,7 +59,7 @@ class MenuActivity : AppCompatActivity() {
 
             pepperoniPizza?.let { item ->
                 findViewById<TextView>(R.id.popularPizzaName).text = item.name
-                findViewById<TextView>(R.id.popularPizzaPrice).text = String.format(Locale.US, "%.0f", item.price)
+                findViewById<TextView>(R.id.popularPizzaPrice).text = String.format(Locale.US, "Rs. %.0f", item.price)
                 Glide.with(this).load(item.imageUrl).into(findViewById(R.id.popularPizzaImage))
                 findViewById<ImageView>(R.id.addPizza).setOnClickListener {
                     CartRepository.addItem(CartItem(item.id, item.name, item.description, item.price, 1, 0, item.imageUrl))

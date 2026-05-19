@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.glide)
+    implementation(libs.gson)
     implementation(libs.googleid)
     implementation(libs.material)
     implementation(libs.androidx.activity)

@@ -33,7 +33,7 @@ class MenuAdapter(private val onAddClick: (MenuItem) -> Unit) : ListAdapter<Menu
         fun bind(item: MenuItem) {
             title.text = item.name
             desc.text = item.description
-            price.text = String.format(Locale.US, "%.0f", item.price)
+            price.text = String.format(Locale.US, "Rs. %.0f", item.price)
             
             Glide.with(itemView.context)
                 .load(item.imageUrl)
